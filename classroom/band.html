@@ -85,8 +85,21 @@
     
     const totalStudents = 30; // Number of students
     const seats = [];
-    const behaviorCounts = {}; // To keep track of Good/Bad counts for each student
+    let behaviorCounts = {}; // To keep track of Good/Bad counts for each student
     
+    // Check if there is any stored data in localStorage
+    if (localStorage.getItem('behaviorCounts')) {
+        behaviorCounts = JSON.parse(localStorage.getItem('behaviorCounts'));
+    } else {
+        // Initialize behavior counters if none exist in localStorage
+        for (let i = 1; i <= totalStudents; i++) {
+            behaviorCounts[i] = {
+                good: 0,
+                bad: 0
+            };
+        }
+    }
+
     // Generate seats and initialize behavior counters
     for (let i = 1; i <= totalStudents; i++) {
         const seat = document.createElement('div');
@@ -94,16 +107,10 @@
         seat.textContent = i;
         seat.dataset.studentId = i;
 
-        // Initialize behavior counters
-        behaviorCounts[i] = {
-            good: 0,
-            bad: 0
-        };
-
         // Create a behavior counter display element
         const behaviorDisplay = document.createElement('div');
         behaviorDisplay.classList.add('behavior-count');
-        behaviorDisplay.textContent = `Good: 0 | Bad: 0`;
+        behaviorDisplay.textContent = `Good: ${behaviorCounts[i].good} | Bad: ${behaviorCounts[i].bad}`;
         seat.appendChild(behaviorDisplay);
 
         seat.addEventListener('click', () => selectSeat(seat));
@@ -135,23 +142,26 @@
                 student.classList.add('bad');
             }
             behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good} | Bad: ${behaviorCounts[studentId].bad}`;
+            // Save the updated behaviorCounts to localStorage
+            localStorage.setItem('behaviorCounts', JSON.stringify(behaviorCounts));
         }
     }
 
-    // Handle keyboard events
+    // Handle keyboard events (both uppercase and lowercase)
     document.addEventListener('keydown', (event) => {
-        if (event.key >= '1' && event.key <= '9' || event.key === '0') {
+        const key = event.key.toLowerCase(); // Convert to lowercase to handle both cases
+        if ((key >= '1' && key <= '9') || key === '0') {
             // Handle student number press (1-30)
-            const studentNumber = parseInt(event.key);
+            const studentNumber = parseInt(key);
             const studentSeat = seats.find(seat => parseInt(seat.textContent) === studentNumber);
             if (studentSeat) {
                 selectSeat(studentSeat);
             }
-        } else if (event.key === 'G' && selectedStudent) {
+        } else if (key === 'g' && selectedStudent) {
             // Good behavior
             updateBehavior(parseInt(selectedStudent.textContent), 'good');
             statusDisplay.textContent = `Student ${selectedStudent.textContent} is doing good!`;
-        } else if (event.key === 'B' && selectedStudent) {
+        } else if (key === 'b' && selectedStudent) {
             // Bad behavior
             updateBehavior(parseInt(selectedStudent.textContent), 'bad');
             statusDisplay.textContent = `Student ${selectedStudent.textContent} is being bad!`;

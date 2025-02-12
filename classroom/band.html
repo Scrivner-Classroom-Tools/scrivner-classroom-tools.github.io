@@ -74,7 +74,6 @@
     <div class="key-instructions">
         <p>Press a number (1-10) to select a group of students (e.g. 1 selects students 1-5).</p>
         <p>'G' for Good behavior, 'B' for Bad behavior.</p>
-        <p>'[' to delete Good behavior, ']' to delete Bad behavior.</p>
     </div>
 </div>
 
@@ -82,7 +81,7 @@
     // Create seating chart with student numbers and behavior counters
     const seatingChart = document.getElementById('seatingChart');
     const statusDisplay = document.getElementById('status');
-    let selectedStudent = null;
+    let selectedStudents = [];  // Stores selected students for mass behavior application
     
     const totalStudents = 30; // Number of students
     const seats = [];
@@ -121,11 +120,13 @@
 
     // Select seat and highlight it
     function selectSeat(seat) {
-        if (selectedStudent) {
-            selectedStudent.classList.remove('selected');
+        if (seat.classList.contains('selected')) {
+            seat.classList.remove('selected');
+            selectedStudents = selectedStudents.filter(id => id !== parseInt(seat.textContent));
+        } else {
+            seat.classList.add('selected');
+            selectedStudents.push(parseInt(seat.textContent));
         }
-        selectedStudent = seat;
-        seat.classList.add('selected');
     }
 
     // Update behavior counts and display
@@ -150,24 +151,6 @@
         localStorage.setItem('behaviorCounts', JSON.stringify(behaviorCounts));
     }
 
-    // Delete behavior from the selected student
-    function deleteBehavior(studentId, behavior) {
-        const student = seats.find(seat => parseInt(seat.textContent) === studentId);
-        if (student) {
-            const behaviorDisplay = student.querySelector('.behavior-count');
-            if (behavior === 'good' && behaviorCounts[studentId].good > 0) {
-                behaviorCounts[studentId].good--;
-                student.classList.remove('good');
-            } else if (behavior === 'bad' && behaviorCounts[studentId].bad > 0) {
-                behaviorCounts[studentId].bad--;
-                student.classList.remove('bad');
-            }
-            behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good} | Bad: ${behaviorCounts[studentId].bad}`;
-            // Save the updated behaviorCounts to localStorage
-            localStorage.setItem('behaviorCounts', JSON.stringify(behaviorCounts));
-        }
-    }
-
     // Handle keyboard events (both uppercase and lowercase)
     document.addEventListener('keydown', (event) => {
         const key = event.key.toLowerCase(); // Convert to lowercase to handle both cases
@@ -178,28 +161,27 @@
             const start = (group - 1) * groupSize + 1;
             const end = group * groupSize;
             const studentIds = Array.from({ length: end - start + 1 }, (_, i) => start + i);
-            updateBehavior(studentIds, 'good'); // Add "Good" behavior for the entire group
-            statusDisplay.textContent = `Group ${group} has received Good behavior.`;
-        } else if (key === 'g' && selectedStudent) {
-            // Good behavior
-            updateBehavior([parseInt(selectedStudent.textContent)], 'good');
-            statusDisplay.textContent = `Student ${selectedStudent.textContent} is doing good!`;
-        } else if (key === 'b' && selectedStudent) {
-            // Bad behavior
-            updateBehavior([parseInt(selectedStudent.textContent)], 'bad');
-            statusDisplay.textContent = `Student ${selectedStudent.textContent} is being bad!`;
-        } else if (key === '[' && selectedStudent) {
-            // Delete Good behavior
-            deleteBehavior(parseInt(selectedStudent.textContent), 'good');
-            statusDisplay.textContent = `Good behavior removed from Student ${selectedStudent.textContent}.`;
-        } else if (key === ']' && selectedStudent) {
-            // Delete Bad behavior
-            deleteBehavior(parseInt(selectedStudent.textContent), 'bad');
-            statusDisplay.textContent = `Bad behavior removed from Student ${selectedStudent.textContent}.`;
+
+            // Select the students for the group
+            selectedStudents = studentIds;
+            seats.forEach(seat => seat.classList.remove('selected')); // Remove previous selections
+            studentIds.forEach(studentId => {
+                const seat = seats.find(seat => parseInt(seat.textContent) === studentId);
+                if (seat) seat.classList.add('selected');
+            });
+
+            statusDisplay.textContent = `Group ${group} selected. Press 'G' for Good or 'B' for Bad behavior.`;
+        } else if (key === 'g' && selectedStudents.length > 0) {
+            // Apply Good behavior to the selected group
+            updateBehavior(selectedStudents, 'good');
+            statusDisplay.textContent = `Good behavior applied to Group ${selectedStudents.join(', ')}.`;
+        } else if (key === 'b' && selectedStudents.length > 0) {
+            // Apply Bad behavior to the selected group
+            updateBehavior(selectedStudents, 'bad');
+            statusDisplay.textContent = `Bad behavior applied to Group ${selectedStudents.join(', ')}.`;
         }
     });
 </script>
 
 </body>
 </html>
-

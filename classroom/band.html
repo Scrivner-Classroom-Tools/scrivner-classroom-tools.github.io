@@ -29,10 +29,11 @@
         }
         .seat {
             width: 100px;
-            height: 100px;
+            height: 120px;
             border: 2px solid #333;
             border-radius: 10px;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             font-weight: bold;
@@ -43,7 +44,7 @@
             margin: 5px;
         }
         .seat.selected {
-            outline: 4px solid lightblue; /* Thicker blue outline (2x the original) */
+            outline: 4px solid lightblue; /* Thicker blue outline */
         }
         .seat.bad {
             background-color: #f7a6a6; /* Red for more bad marks */
@@ -63,6 +64,12 @@
             bottom: 5px;
             font-size: 12px;
             color: #333;
+        }
+        .nickname-input {
+            width: 80%;
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 5px;
         }
     </style>
 </head>
@@ -90,6 +97,7 @@
     let selectedStudents = [];  // Stores selected students for mass behavior application
     const seats = [];
     let behaviorCounts = {}; // To keep track of Good/Bad counts for each student
+    let nicknames = {}; // To store nicknames for each student
 
     // Define the groupings
     const groups = {
@@ -108,20 +116,26 @@
     // Initialize behaviorCounts with zero behavior tallies for each student
     for (let i = 1; i <= totalStudents; i++) {
         behaviorCounts[i] = { good: 0, bad: 0 };
+        nicknames[i] = ''; // Initialize empty nickname for each student
     }
 
-    // Load saved behavior data from localStorage
+    // Load saved behavior and nickname data from localStorage
     function loadBehaviorData() {
         const savedData = JSON.parse(localStorage.getItem('behaviorData'));
         if (savedData) {
-            behaviorCounts = savedData;
+            behaviorCounts = savedData.behaviorCounts;
+            nicknames = savedData.nicknames;
             updateSeats();
         }
     }
 
-    // Save behavior data to localStorage
+    // Save behavior and nickname data to localStorage
     function saveBehaviorData() {
-        localStorage.setItem('behaviorData', JSON.stringify(behaviorCounts));
+        const dataToSave = {
+            behaviorCounts: behaviorCounts,
+            nicknames: nicknames
+        };
+        localStorage.setItem('behaviorData', JSON.stringify(dataToSave));
     }
 
     // Define rows: 6 seats in the first row, 8 in the second, 9 in the third, 4 in the fourth
@@ -142,15 +156,31 @@
             row.forEach(studentId => {
                 const seat = document.createElement('div');
                 seat.classList.add('seat');
-                seat.textContent = studentId;
                 seat.dataset.studentId = studentId;
+
+                // Create the nickname input field
+                const nicknameInput = document.createElement('input');
+                nicknameInput.classList.add('nickname-input');
+                nicknameInput.value = nicknames[studentId];
+                nicknameInput.placeholder = "Nickname";
+                nicknameInput.addEventListener('input', (event) => {
+                    nicknames[studentId] = event.target.value;
+                    saveBehaviorData(); // Save data whenever a nickname is changed
+                });
+
+                // Add nickname input above the student number
+                const studentNumber = document.createElement('div');
+                studentNumber.textContent = studentId;
 
                 // Add behavior count display to each seat
                 const behaviorDisplay = document.createElement('div');
                 behaviorDisplay.classList.add('behavior-count');
                 behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good} | Bad: ${behaviorCounts[studentId].bad}`;
+                
+                seat.appendChild(nicknameInput);
+                seat.appendChild(studentNumber);
                 seat.appendChild(behaviorDisplay);
-
+                
                 seat.addEventListener('click', () => selectSeat(seat));
                 rowDiv.appendChild(seat);
                 seats.push(seat);
@@ -165,7 +195,7 @@
 
     // Update the seat's background color based on behavior counts
     function updateSeatColor(seat) {
-        const studentId = parseInt(seat.textContent);
+        const studentId = parseInt(seat.dataset.studentId);
         const goodCount = behaviorCounts[studentId].good;
         const badCount = behaviorCounts[studentId].bad;
 
@@ -185,17 +215,17 @@
     function selectSeat(seat) {
         if (seat.classList.contains('selected')) {
             seat.classList.remove('selected');
-            selectedStudents = selectedStudents.filter(id => id !== parseInt(seat.textContent));
+            selectedStudents = selectedStudents.filter(id => id !== parseInt(seat.dataset.studentId));
         } else {
             seat.classList.add('selected');
-            selectedStudents.push(parseInt(seat.textContent));
+            selectedStudents.push(parseInt(seat.dataset.studentId));
         }
     }
 
     // Update behavior counts and display
     function updateBehavior(studentIds, behavior) {
         studentIds.forEach(studentId => {
-            const student = seats.find(seat => parseInt(seat.textContent) === studentId);
+            const student = seats.find(seat => parseInt(seat.dataset.studentId) === studentId);
             if (student) {
                 const behaviorDisplay = student.querySelector('.behavior-count');
                 if (behavior === 'good') {
@@ -217,7 +247,7 @@
     // Remove behavior (Good or Bad)
     function deleteBehavior(studentIds, behavior) {
         studentIds.forEach(studentId => {
-            const student = seats.find(seat => parseInt(seat.textContent) === studentId);
+            const student = seats.find(seat => parseInt(seat.dataset.studentId) === studentId);
             if (student) {
                 const behaviorDisplay = student.querySelector('.behavior-count');
                 if (behavior === 'good' && behaviorCounts[studentId].good > 0) {
@@ -253,7 +283,7 @@
                 selectedStudents = studentIds;
                 seats.forEach(seat => seat.classList.remove('selected')); // Remove previous selections
                 studentIds.forEach(studentId => {
-                    const seat = seats.find(seat => parseInt(seat.textContent) === studentId);
+                    const seat = seats.find(seat => parseInt(seat.dataset.studentId) === studentId);
                     if (seat) seat.classList.add('selected');
                 });
                 statusDisplay.textContent = `Group ${group} selected. Press 'G' for Good or 'B' for Bad behavior.`;

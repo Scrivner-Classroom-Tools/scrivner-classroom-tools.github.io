@@ -43,7 +43,7 @@
             margin: 5px;
         }
         .seat.selected {
-            outline: 2px solid lightblue; /* Light blue outline on selection */
+            outline: 4px solid lightblue; /* Thicker blue outline (2x the original) */
         }
         .seat.bad {
             background-color: #f7a6a6; /* Red for more bad marks */
@@ -110,6 +110,20 @@
         behaviorCounts[i] = { good: 0, bad: 0 };
     }
 
+    // Load saved behavior data from localStorage
+    function loadBehaviorData() {
+        const savedData = JSON.parse(localStorage.getItem('behaviorData'));
+        if (savedData) {
+            behaviorCounts = savedData;
+            updateSeats();
+        }
+    }
+
+    // Save behavior data to localStorage
+    function saveBehaviorData() {
+        localStorage.setItem('behaviorData', JSON.stringify(behaviorCounts));
+    }
+
     // Define rows: 6 seats in the first row, 8 in the second, 9 in the third, 4 in the fourth
     const rows = [
         [1, 2, 3, 4, 5, 6], // Row 1: 6 students
@@ -119,32 +133,35 @@
     ];
 
     // Create seats in the grid for each row
-    rows.forEach((row, rowIndex) => {
-        const rowDiv = document.createElement('div');
-        rowDiv.classList.add('row');
+    function updateSeats() {
+        seatingChart.innerHTML = ''; // Clear existing seats
+        rows.forEach((row, rowIndex) => {
+            const rowDiv = document.createElement('div');
+            rowDiv.classList.add('row');
 
-        row.forEach(studentId => {
-            const seat = document.createElement('div');
-            seat.classList.add('seat');
-            seat.textContent = studentId;
-            seat.dataset.studentId = studentId;
+            row.forEach(studentId => {
+                const seat = document.createElement('div');
+                seat.classList.add('seat');
+                seat.textContent = studentId;
+                seat.dataset.studentId = studentId;
 
-            // Add behavior count display to each seat
-            const behaviorDisplay = document.createElement('div');
-            behaviorDisplay.classList.add('behavior-count');
-            behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good} | Bad: ${behaviorCounts[studentId].bad}`;
-            seat.appendChild(behaviorDisplay);
+                // Add behavior count display to each seat
+                const behaviorDisplay = document.createElement('div');
+                behaviorDisplay.classList.add('behavior-count');
+                behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good} | Bad: ${behaviorCounts[studentId].bad}`;
+                seat.appendChild(behaviorDisplay);
 
-            seat.addEventListener('click', () => selectSeat(seat));
-            rowDiv.appendChild(seat);
-            seats.push(seat);
+                seat.addEventListener('click', () => selectSeat(seat));
+                rowDiv.appendChild(seat);
+                seats.push(seat);
 
-            // Update the seat's background color based on behavior
-            updateSeatColor(seat);
+                // Update the seat's background color based on behavior
+                updateSeatColor(seat);
+            });
+
+            seatingChart.appendChild(rowDiv); // Add the row to the chart
         });
-
-        seatingChart.appendChild(rowDiv); // Add the row to the chart
-    });
+    }
 
     // Update the seat's background color based on behavior counts
     function updateSeatColor(seat) {
@@ -194,6 +211,7 @@
                 updateSeatColor(student); // Update seat color based on the new counts
             }
         });
+        saveBehaviorData(); // Save data after behavior update
     }
 
     // Remove behavior (Good or Bad)
@@ -213,6 +231,7 @@
                 updateSeatColor(student); // Update seat color based on the new counts
             }
         });
+        saveBehaviorData(); // Save data after behavior update
     }
 
     // Handle keyboard events (both uppercase and lowercase)
@@ -257,6 +276,9 @@
             statusDisplay.textContent = `Bad behavior removed from Group ${selectedStudents.join(', ')}.`;
         }
     });
+
+    // Load saved data when the page is loaded
+    window.onload = loadBehaviorData;
 </script>
 
 </body>

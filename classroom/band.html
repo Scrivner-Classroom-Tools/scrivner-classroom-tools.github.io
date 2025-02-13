@@ -44,6 +44,7 @@
         }
         .seat.selected {
             background-color: #cfe9cf;
+            border: 3px solid blue; /* Added blue outline when selected */
         }
         .seat.bad {
             background-color: #f7a6a6;
@@ -220,7 +221,6 @@
             const group = parseInt(key);
             const studentIds = groups[group];
 
-            // Check if the group is already selected
             if (selectedStudents.length === studentIds.length && studentIds.every(id => selectedStudents.includes(id))) {
                 // Deselect the group if it's already selected
                 selectedStudents = [];
@@ -246,11 +246,11 @@
             statusDisplay.textContent = `Bad behavior applied to Group ${selectedStudents.join(', ')}.`;
         } else if (key === '[' && selectedStudents.length > 0) {
             // Remove Good behavior from the selected group
-            deleteBehavior(selectedStudents, 'good');
+            updateBehavior(selectedStudents, 'good');
             statusDisplay.textContent = `Good behavior removed from Group ${selectedStudents.join(', ')}.`;
         } else if (key === ']' && selectedStudents.length > 0) {
             // Remove Bad behavior from the selected group
-            deleteBehavior(selectedStudents, 'bad');
+            updateBehavior(selectedStudents, 'bad');
             statusDisplay.textContent = `Bad behavior removed from Group ${selectedStudents.join(', ')}.`;
         }
     });

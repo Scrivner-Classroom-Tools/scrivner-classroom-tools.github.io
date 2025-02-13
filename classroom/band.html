@@ -38,18 +38,18 @@
             font-weight: bold;
             cursor: pointer;
             background-color: #e0e0e0;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, border-color 0.3s;
             position: relative;
             margin: 5px;
         }
         .seat.selected {
-            background-color: #cfe9cf;
+            outline: 2px solid lightblue; /* Light blue outline on selection */
         }
         .seat.bad {
-            background-color: #f7a6a6;
+            background-color: #f7a6a6; /* Red for more bad marks */
         }
         .seat.good {
-            background-color: #a3e4a5;
+            background-color: #a3e4a5; /* Green for more good marks */
         }
         .status {
             font-size: 20px;
@@ -122,7 +122,6 @@
     rows.forEach((row, rowIndex) => {
         const rowDiv = document.createElement('div');
         rowDiv.classList.add('row');
-        console.log(`Creating Row ${rowIndex + 1}`);
 
         row.forEach(studentId => {
             const seat = document.createElement('div');
@@ -139,10 +138,31 @@
             seat.addEventListener('click', () => selectSeat(seat));
             rowDiv.appendChild(seat);
             seats.push(seat);
+
+            // Update the seat's background color based on behavior
+            updateSeatColor(seat);
         });
 
         seatingChart.appendChild(rowDiv); // Add the row to the chart
     });
+
+    // Update the seat's background color based on behavior counts
+    function updateSeatColor(seat) {
+        const studentId = parseInt(seat.textContent);
+        const goodCount = behaviorCounts[studentId].good;
+        const badCount = behaviorCounts[studentId].bad;
+
+        // Set color based on more good or bad behavior
+        if (goodCount > badCount) {
+            seat.classList.add('good');
+            seat.classList.remove('bad');
+        } else if (badCount > goodCount) {
+            seat.classList.add('bad');
+            seat.classList.remove('good');
+        } else {
+            seat.classList.remove('good', 'bad'); // Neutral state
+        }
+    }
 
     // Select seat and highlight it
     function selectSeat(seat) {
@@ -171,6 +191,7 @@
                     student.classList.add('bad');
                 }
                 behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good} | Bad: ${behaviorCounts[studentId].bad}`;
+                updateSeatColor(student); // Update seat color based on the new counts
             }
         });
     }
@@ -189,6 +210,7 @@
                     student.classList.remove('bad');
                 }
                 behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good} | Bad: ${behaviorCounts[studentId].bad}`;
+                updateSeatColor(student); // Update seat color based on the new counts
             }
         });
     }

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="Scrivner_Classroom_Tools_Logo_Circle.png" type="image/png">
+    <title>Class Hub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9; 
+            color: #4a90e2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #menu {
+            text-align: center;
+        }
+        #menu h1 {
+            margin-bottom: 40px;
+        }
+        .game-button {
+            font-size: 24px;
+            margin: 20px;
+            padding: 10px 20px;
+            background-color: #4a90e2;
+            color: #282c34;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .game-button:hover {
+            background-color: #50a9c0;
+        }
+    </style>
+</head>
+<body>
+    <div id="menu">
+        <h1>Classroom Utilities</h1>
+        <button class="game-button" onclick="navigateToFile('group')">Random Group Generator</button>
+        <!-- <button class="game-button" onclick="navigateToGame('tetris')">Tetris</button>
+        <button class="game-button" onclick="navigateToGame('brick-breaker')">Brick Breaker</button>
+        <button class="game-button" onclick="navigateToGame('maze')">Maze</button>
+        <button class="game-button" onclick="navigateToGame('stack')">Stack</button>
+        <button class="game-button" onclick="navigateToihtasham42('progress-knight')">Progress Knight</button>
+        <button class="game-button" onclick="navigateToG('server')">GG</button> -->
+
+        <!-- Add more game buttons here -->
+    </div>
+
+    <script>
+        function navigateToFile(fileName) {
+            window.location.href = 'https://classroom.scrivner.xyz/classroom/' + fileName;
+        }
+    </script>
+    <script>
+        function navigateToihtasham42(siteName) {
+            window.location.href = 'https://ihtasham42.github.io/' + siteName;
+        }
+    </script>
+    <script>
+        function navigateToG(gsiteName) {
+            window.location.href = 'https://classroom.scrivner.xyz/goguardian/' + gsiteName;
+        }
+    </script>
+</body>
+</html>

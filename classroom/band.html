@@ -40,6 +40,7 @@
             background-color: #e0e0e0;
             transition: background-color 0.3s;
             position: relative;
+            margin: 5px;
         }
         .seat.selected {
             background-color: #cfe9cf;
@@ -103,17 +104,10 @@
 
     // Total number of students (grouped as described)
     const totalStudents = 30;
-
-    // Load data from localStorage if available
-    const savedData = JSON.parse(localStorage.getItem('behaviorData'));
-    if (savedData) {
-        behaviorCounts = savedData.behaviorCounts || {};
-        selectedStudents = savedData.selectedStudents || [];
-    } else {
-        // Initialize behaviorCounts with zero behavior tallies for each student
-        for (let i = 1; i <= totalStudents; i++) {
-            behaviorCounts[i] = { good: 0, bad: 0 };
-        }
+    
+    // Initialize behaviorCounts with zero behavior tallies for each student
+    for (let i = 1; i <= totalStudents; i++) {
+        behaviorCounts[i] = { good: 0, bad: 0 };
     }
 
     // Define rows: 6 seats in the first row, 8 in the second, 9 in the third, 4 in the fourth
@@ -128,6 +122,7 @@
     rows.forEach((row, rowIndex) => {
         const rowDiv = document.createElement('div');
         rowDiv.classList.add('row');
+        console.log(`Creating Row ${rowIndex + 1}`);
 
         row.forEach(studentId => {
             const seat = document.createElement('div');
@@ -151,26 +146,13 @@
 
     // Select seat and highlight it
     function selectSeat(seat) {
-        const studentId = parseInt(seat.textContent);
-
         if (seat.classList.contains('selected')) {
-            // Deselect the seat and remove from selectedStudents array
             seat.classList.remove('selected');
-            selectedStudents = selectedStudents.filter(id => id !== studentId);
+            selectedStudents = selectedStudents.filter(id => id !== parseInt(seat.textContent));
         } else {
-            // Select the seat and add to selectedStudents array
             seat.classList.add('selected');
-            selectedStudents.push(studentId);
+            selectedStudents.push(parseInt(seat.textContent));
         }
-
-        // Update the status display with selected students
-        if (selectedStudents.length > 0) {
-            statusDisplay.textContent = `Selected students: ${selectedStudents.join(', ')}. Press 'G' for Good or 'B' for Bad behavior.`;
-        } else {
-            statusDisplay.textContent = `Press a student number and then press 'G' for Good or 'B' for Bad behavior.`;
-        }
-
-        saveData(); // Save the updated data
     }
 
     // Update behavior counts and display
@@ -191,7 +173,6 @@
                 behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good} | Bad: ${behaviorCounts[studentId].bad}`;
             }
         });
-        saveData(); // Save data after updating behavior
     }
 
     // Remove behavior (Good or Bad)
@@ -210,16 +191,6 @@
                 behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good} | Bad: ${behaviorCounts[studentId].bad}`;
             }
         });
-        saveData(); // Save data after deleting behavior
-    }
-
-    // Save data to localStorage
-    function saveData() {
-        const data = {
-            behaviorCounts: behaviorCounts,
-            selectedStudents: selectedStudents
-        };
-        localStorage.setItem('behaviorData', JSON.stringify(data));
     }
 
     // Handle keyboard events (both uppercase and lowercase)

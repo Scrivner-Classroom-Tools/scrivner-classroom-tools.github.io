@@ -44,7 +44,7 @@
         }
         .seat.selected {
             background-color: #cfe9cf;
-            border: 3px solid blue; /* Added blue outline when selected */
+            border: 3px solid blue; /* Blue outline on selection */
         }
         .seat.bad {
             background-color: #f7a6a6;
@@ -144,7 +144,7 @@
             nicknameInput.placeholder = "Nickname";
             nicknameInput.addEventListener('input', (event) => {
                 nicknames[studentId] = event.target.value; // Store the nickname
-                saveBehaviorData();
+                saveBehaviorData(); // Save updated nickname
             });
 
             // Add behavior count display to each seat
@@ -177,7 +177,7 @@
         if (savedData) {
             behaviorCounts = savedData.behaviorCounts;
             nicknames = savedData.nicknames;
-            updateSeats();
+            updateSeats(); // Ensure the UI reflects saved data
         }
     }
 
@@ -199,7 +199,7 @@
                 behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good} | Bad: ${behaviorCounts[studentId].bad}`;
             }
         });
-        saveBehaviorData();
+        saveBehaviorData(); // Save changes after behavior update
     }
 
     // Handle seat selection
@@ -246,12 +246,22 @@
             statusDisplay.textContent = `Bad behavior applied to Group ${selectedStudents.join(', ')}.`;
         } else if (key === '[' && selectedStudents.length > 0) {
             // Remove Good behavior from the selected group
-            updateBehavior(selectedStudents, 'good');
+            selectedStudents.forEach(studentId => {
+                behaviorCounts[studentId].good = 0;
+                const student = seats.find(seat => parseInt(seat.textContent) === studentId);
+                if (student) student.classList.remove('good');
+            });
             statusDisplay.textContent = `Good behavior removed from Group ${selectedStudents.join(', ')}.`;
+            saveBehaviorData(); // Save the state after removal
         } else if (key === ']' && selectedStudents.length > 0) {
             // Remove Bad behavior from the selected group
-            updateBehavior(selectedStudents, 'bad');
+            selectedStudents.forEach(studentId => {
+                behaviorCounts[studentId].bad = 0;
+                const student = seats.find(seat => parseInt(seat.textContent) === studentId);
+                if (student) student.classList.remove('bad');
+            });
             statusDisplay.textContent = `Bad behavior removed from Group ${selectedStudents.join(', ')}.`;
+            saveBehaviorData(); // Save the state after removal
         }
     });
 

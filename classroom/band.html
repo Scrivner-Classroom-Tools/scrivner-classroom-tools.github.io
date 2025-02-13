@@ -104,9 +104,16 @@
     // Total number of students (grouped as described)
     const totalStudents = 30;
 
-    // Initialize behaviorCounts with zero behavior tallies for each student
-    for (let i = 1; i <= totalStudents; i++) {
-        behaviorCounts[i] = { good: 0, bad: 0 };
+    // Load data from localStorage if available
+    const savedData = JSON.parse(localStorage.getItem('behaviorData'));
+    if (savedData) {
+        behaviorCounts = savedData.behaviorCounts || {};
+        selectedStudents = savedData.selectedStudents || [];
+    } else {
+        // Initialize behaviorCounts with zero behavior tallies for each student
+        for (let i = 1; i <= totalStudents; i++) {
+            behaviorCounts[i] = { good: 0, bad: 0 };
+        }
     }
 
     // Define rows: 6 seats in the first row, 8 in the second, 9 in the third, 4 in the fourth
@@ -162,6 +169,8 @@
         } else {
             statusDisplay.textContent = `Press a student number and then press 'G' for Good or 'B' for Bad behavior.`;
         }
+
+        saveData(); // Save the updated data
     }
 
     // Update behavior counts and display
@@ -206,7 +215,11 @@
 
     // Save data to localStorage
     function saveData() {
-        localStorage.setItem('behaviorData', JSON.stringify(behaviorCounts));
+        const data = {
+            behaviorCounts: behaviorCounts,
+            selectedStudents: selectedStudents
+        };
+        localStorage.setItem('behaviorData', JSON.stringify(data));
     }
 
     // Handle keyboard events (both uppercase and lowercase)

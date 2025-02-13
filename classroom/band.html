@@ -117,12 +117,6 @@
         [24, 25, 26, 27] // Row 4: 4 students
     ];
 
-    // Load behavior data from localStorage
-    const savedData = JSON.parse(localStorage.getItem('behaviorData'));
-    if (savedData) {
-        behaviorCounts = savedData;
-    }
-
     // Create seats in the grid for each row
     rows.forEach((row, rowIndex) => {
         const rowDiv = document.createElement('div');
@@ -150,12 +144,23 @@
 
     // Select seat and highlight it
     function selectSeat(seat) {
+        const studentId = parseInt(seat.textContent);
+
         if (seat.classList.contains('selected')) {
+            // Deselect the seat and remove from selectedStudents array
             seat.classList.remove('selected');
-            selectedStudents = selectedStudents.filter(id => id !== parseInt(seat.textContent));
+            selectedStudents = selectedStudents.filter(id => id !== studentId);
         } else {
+            // Select the seat and add to selectedStudents array
             seat.classList.add('selected');
-            selectedStudents.push(parseInt(seat.textContent));
+            selectedStudents.push(studentId);
+        }
+
+        // Update the status display with selected students
+        if (selectedStudents.length > 0) {
+            statusDisplay.textContent = `Selected students: ${selectedStudents.join(', ')}. Press 'G' for Good or 'B' for Bad behavior.`;
+        } else {
+            statusDisplay.textContent = `Press a student number and then press 'G' for Good or 'B' for Bad behavior.`;
         }
     }
 

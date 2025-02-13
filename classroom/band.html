@@ -103,7 +103,7 @@
 
     // Total number of students (grouped as described)
     const totalStudents = 30;
-    
+
     // Initialize behaviorCounts with zero behavior tallies for each student
     for (let i = 1; i <= totalStudents; i++) {
         behaviorCounts[i] = { good: 0, bad: 0 };
@@ -116,6 +116,12 @@
         [15, 16, 17, 18, 19, 20, 21, 22, 23], // Row 3: 9 students
         [24, 25, 26, 27] // Row 4: 4 students
     ];
+
+    // Load behavior data from localStorage
+    const savedData = JSON.parse(localStorage.getItem('behaviorData'));
+    if (savedData) {
+        behaviorCounts = savedData;
+    }
 
     // Create seats in the grid for each row
     rows.forEach((row, rowIndex) => {
@@ -171,6 +177,7 @@
                 behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good} | Bad: ${behaviorCounts[studentId].bad}`;
             }
         });
+        saveData(); // Save data after updating behavior
     }
 
     // Remove behavior (Good or Bad)
@@ -189,6 +196,12 @@
                 behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good} | Bad: ${behaviorCounts[studentId].bad}`;
             }
         });
+        saveData(); // Save data after deleting behavior
+    }
+
+    // Save data to localStorage
+    function saveData() {
+        localStorage.setItem('behaviorData', JSON.stringify(behaviorCounts));
     }
 
     // Handle keyboard events (both uppercase and lowercase)

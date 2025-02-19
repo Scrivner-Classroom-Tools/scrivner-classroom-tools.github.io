@@ -9,42 +9,31 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9; 
+            background-color: #f4f4f9;
             color: #4a90e2;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-        }
-        #menu {
-            text-align: center;
-        }
-        #menu h1 {
-            margin-bottom: 40px;
-        }
-        .game-button {
-            font-size: 24px;
-            margin: 20px;
-            padding: 10px 20px;
-            background-color: #4a90e2;
-            color: #282c34;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .game-button:hover {
-            background-color: #50a9c0;
+            padding-top: 70px; /* Prevents content from being hidden behind the fixed banner */
         }
 
-         /* Banner Styling */
+        /* Banner Styling */
         .banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: #333;
             color: white;
             padding: 10px 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000; /* Ensures the banner stays above other content */
         }
 
         /* Logo and Title */
@@ -77,14 +66,36 @@
         .nav-buttons a:hover {
             background-color: #777;
         }
+
+        /* Centered Content */
+        .container {
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .game-button {
+            font-size: 24px;
+            margin: 20px;
+            padding: 10px 20px;
+            background-color: #4a90e2;
+            color: #282c34;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .game-button:hover {
+            background-color: #50a9c0;
+        }
     </style>
 </head>
 <body>
 
+    <!-- Banner -->
     <div class="banner">
         <div class="logo-title">
             <img src="logo.png" alt="Logo" class="logo">
-            <h2>My Website</h2>
+            <h2>Class Hub</h2>
         </div>
         <div class="nav-buttons">
             <a href="#">Home</a>
@@ -92,84 +103,80 @@
             <a href="#">Contact</a>
         </div>
     </div>
-    
-    <div id="menu">
-        <h1>Classroom Utilities</h1>
-        <button class="game-button" onclick="navigateToFile('group')">Random Group Generator</button>
-        <button class="game-button" onclick="navigateToFile('band')">Behavior Chart</button>
-        <!-- <button class="game-button" onclick="navigateToGame('tetris')">Tetris</button>
-        <button class="game-button" onclick="navigateToGame('brick-breaker')">Brick Breaker</button>
-        <button class="game-button" onclick="navigateToGame('maze')">Maze</button>
-        <button class="game-button" onclick="navigateToGame('stack')">Stack</button>
-        <button class="game-button" onclick="navigateToihtasham42('progress-knight')">Progress Knight</button>
-        <button class="game-button" onclick="navigateToG('server')">GG</button> -->
 
-        <!-- Add more game buttons here -->
-    </div>
-    <div id="login">
-        <h1>Supabase Google Login</h1>
-    
-    <button onclick="signInWithGoogle()">Sign in with Google</button>
-    <button onclick="signOut()">Sign out</button>
-    <p id="user-info"></p>
+    <!-- Main Content -->
+    <div class="container">
+        <div id="menu">
+            <h1>Classroom Utilities</h1>
+            <button class="game-button" onclick="navigateToFile('group')">Random Group Generator</button>
+            <button class="game-button" onclick="navigateToFile('band')">Behavior Chart</button>
+        </div>
 
-    
+        <div id="login">
+            <h1>Supabase Google Login</h1>
+            <button onclick="signInWithGoogle()">Sign in with Google</button>
+            <button onclick="signOut()">Sign out</button>
+            <p id="user-info"></p>
+        </div>
     </div>
 
 <script>
-        // Initialize Supabase
-        const SUPABASE_URL = "https://dqkjwnvdqzukhzvdtidr.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxa2p3bnZkcXp1a2h6dmR0aWRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5OTU4NjYsImV4cCI6MjA1NTU3MTg2Nn0.TCrjefgNWfi_YIPy-2PUBPBTPf5Dtn-DPQOVY3wV5RE";
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Initialize Supabase
+    const SUPABASE_URL = "https://dqkjwnvdqzukhzvdtidr.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxa2p3bnZkcXp1a2h6dmR0aWRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5OTU4NjYsImV4cCI6MjA1NTU3MTg2Nn0.TCrjefgNWfi_YIPy-2PUBPBTPf5Dtn-DPQOVY3wV5RE";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Google Sign-In
-        async function signInWithGoogle() {
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: "google",
-            });
-            if (error) {
-                console.error("Google sign-in error:", error.message);
-            } else {
-                console.log("Redirecting to Google...");
-            }
+    // Google Sign-In
+    async function signInWithGoogle() {
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: "google",
+        });
+        if (error) {
+            console.error("Google sign-in error:", error.message);
+        } else {
+            console.log("Redirecting to Google...");
         }
+    }
 
-        // Check if user is logged in
-        async function checkUser() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                console.log("User logged in:", user);
-                document.getElementById("user-info").innerText = `Welcome, ${user.email}`;
-            } else {
-                console.log("No user logged in.");
-            }
+    // Check if user is logged in
+    async function checkUser() {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            console.log("User logged in:", user);
+            document.getElementById("user-info").innerText = `Welcome, ${user.email}`;
+        } else {
+            console.log("No user logged in.");
         }
+    }
 
-        // Sign out
-        async function signOut() {
-            await supabase.auth.signOut();
-            console.log("User signed out");
-            location.reload();
-        }
+    // Sign out
+    async function signOut() {
+        await supabase.auth.signOut();
+        console.log("User signed out");
+        location.reload();
+    }
 
-        // Check if user is already logged in on page load
-        checkUser();
-    </script>
-    
-    <script>
-        function navigateToFile(fileName) {
-            window.location.href = 'https://classroom.scrivner.xyz/classroom/' + fileName;
-        }
-    </script>
-    <script>
-        function navigateToihtasham42(siteName) {
-            window.location.href = 'https://ihtasham42.github.io/' + siteName;
-        }
-    </script>
-    <script>
-        function navigateToG(gsiteName) {
-            window.location.href = 'https://classroom.scrivner.xyz/goguardian/' + gsiteName;
-        }
-    </script>
+    // Check if user is already logged in on page load
+    checkUser();
+</script>
+
+<script>
+    function navigateToFile(fileName) {
+        window.location.href = 'https://classroom.scrivner.xyz/classroom/' + fileName;
+    }
+</script>
+
+<script>
+    function navigateToihtasham42(siteName) {
+        window.location.href = 'https://ihtasham42.github.io/' + siteName;
+    }
+</script>
+
+<script>
+    function navigateToG(gsiteName) {
+        window.location.href = 'https://classroom.scrivner.xyz/goguardian/' + gsiteName;
+    }
+</script>
+
 </body>
 </html>

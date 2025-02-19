@@ -59,7 +59,10 @@
     <button onclick="signOut()">Sign out</button>
     <p id="user-info"></p>
 
-    <script>
+    
+    </div>
+
+<script>
         // Initialize Supabase
         const SUPABASE_URL = "https://dqkjwnvdqzukhzvdtidr.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxa2p3bnZkcXp1a2h6dmR0aWRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5OTU4NjYsImV4cCI6MjA1NTU3MTg2Nn0.TCrjefgNWfi_YIPy-2PUBPBTPf5Dtn-DPQOVY3wV5RE";
@@ -98,8 +101,7 @@
         // Check if user is already logged in on page load
         checkUser();
     </script>
-    </div>
-
+    
     <script>
         function navigateToFile(fileName) {
             window.location.href = 'https://classroom.scrivner.xyz/classroom/' + fileName;

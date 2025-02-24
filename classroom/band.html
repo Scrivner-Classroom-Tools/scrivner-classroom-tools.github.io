@@ -93,6 +93,12 @@
 </div>
 
 <script>
+
+    // Initialize Supabase
+const SUPABASE_URL = "https://dqkjwnvdqzukhzvdtidr.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxa2p3bnZkcXp1a2h6dmR0aWRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5OTU4NjYsImV4cCI6MjA1NTU3MTg2Nn0.TCrjefgNWfi_YIPy-2PUBPBTPf5Dtn-DPQOVY3wV5RE";
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
     const seatingChart = document.getElementById('seatingChart');
     const statusDisplay = document.getElementById('status');
     let selectedStudents = [];  // Stores selected students for mass behavior application
@@ -174,14 +180,31 @@
     }
 
     // Load behavior and nickname data from localStorage on page load
-    function loadBehaviorData() {
-        const savedData = JSON.parse(localStorage.getItem('behaviorData'));
-        if (savedData) {
-            behaviorCounts = savedData.behaviorCounts;
-            nicknames = savedData.nicknames;
-            updateSeats();
-        }
+    async function loadBehaviorData() {
+    const { data, error } = await supabase
+        .from('behavior_chart')  // Replace with your actual table name
+        .select('*');
+
+    if (error) {
+        console.error('Error loading data:', error);
+        return;
     }
+
+    if (data.length > 0) {
+        // Reset local behaviorCounts and nicknames
+        behaviorCounts = {};
+        nicknames = {};
+
+        data.forEach(entry => {
+            const studentId = entry.student_id;
+            behaviorCounts[studentId] = { good: entry.good, bad: entry.bad };
+            nicknames[studentId] = entry.nickname || ''; // Handle potential null values
+        });
+
+        updateSeats();
+    }
+}
+
 
     // Update the seat UI with behavior data
     function updateSeats() {

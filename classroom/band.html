@@ -116,8 +116,8 @@
 
     // Initialize behaviorCounts and nicknames with zero behavior tallies and empty nicknames
     for (let i = 1; i <= totalStudents; i++) {
-        behaviorCounts[i] = behaviorCounts[i] || { good: 0, bad: 0 };  // Make sure it's initialized
-        nicknames[i] = nicknames[i] || '';  // Make sure the nickname is initialized
+        behaviorCounts[i] = { good: 0, bad: 0 };  // Initialize behavior counts
+        nicknames[i] = '';  // Initialize nicknames
     }
 
     // Define rows: 6 seats in the first row, 8 in the second, 9 in the third, 4 in the fourth
@@ -179,30 +179,32 @@
         if (savedData) {
             behaviorCounts = savedData.behaviorCounts || {};  // Add fallback to empty object
             nicknames = savedData.nicknames || {};  // Add fallback to empty object
-            updateSeats();
         } else {
             console.log("No saved behavior data found.");
         }
+        updateSeats();
     }
 
     // Update the seat UI with behavior data
     function updateSeats() {
         seats.forEach(seat => {
             const studentId = parseInt(seat.textContent);
+            const behaviorDisplay = seat.querySelector('.behavior-count');
             if (behaviorCounts[studentId]) {
-                const behaviorDisplay = seat.querySelector('.behavior-count');
-                if (behaviorDisplay) {
-                    behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good || 0} | Bad: ${behaviorCounts[studentId].bad || 0}`;
-                }
+                behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good || 0} | Bad: ${behaviorCounts[studentId].bad || 0}`;
+            }
 
-                if (behaviorCounts[studentId].good > 0) {
-                    seat.classList.add('good');
-                }
-                if (behaviorCounts[studentId].bad > 0) {
-                    seat.classList.add('bad');
-                }
+            // Apply good and bad behavior styles
+            if (behaviorCounts[studentId].good > 0) {
+                seat.classList.add('good');
             } else {
-                console.error(`No behavior data found for student ID: ${studentId}`);
+                seat.classList.remove('good');
+            }
+
+            if (behaviorCounts[studentId].bad > 0) {
+                seat.classList.add('bad');
+            } else {
+                seat.classList.remove('bad');
             }
         });
     }

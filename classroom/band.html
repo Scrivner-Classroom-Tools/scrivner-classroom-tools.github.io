@@ -88,7 +88,7 @@
     <div class="key-instructions">
         <p>Press a number (1-7) to select a group of students.</p>
         <p>'G' for Good behavior, 'B' for Bad behavior.</p>
-        <p>'[' to delete Good behavior, ']' to delete Bad behavior.</p>
+        <p>'[' to delete Good behavior, ']' to delete Bad behavior (one at a time).</p>
     </div>
 </div>
 
@@ -251,6 +251,7 @@
                 if (seat) seat.classList.add('good');
             });
             statusDisplay.textContent = `Good behavior applied to Group ${selectedStudents.join(', ')}.`;
+            updateSeats();
             saveBehaviorData();
         } else if (key === 'b' && selectedStudents.length > 0) {
             selectedStudents.forEach(studentId => {
@@ -259,22 +260,29 @@
                 if (seat) seat.classList.add('bad');
             });
             statusDisplay.textContent = `Bad behavior applied to Group ${selectedStudents.join(', ')}.`;
+            updateSeats();
             saveBehaviorData();
         } else if (key === '[' && selectedStudents.length > 0) {
             selectedStudents.forEach(studentId => {
-                behaviorCounts[studentId].good = 0;
-                const seat = seats.find(seat => parseInt(seat.textContent) === studentId);
-                if (seat) seat.classList.remove('good');
+                if (behaviorCounts[studentId].good > 0) {
+                    behaviorCounts[studentId].good--;
+                    const seat = seats.find(seat => parseInt(seat.textContent) === studentId);
+                    if (seat) seat.classList.remove('good');
+                }
             });
             statusDisplay.textContent = `Good behavior removed from Group ${selectedStudents.join(', ')}.`;
+            updateSeats();
             saveBehaviorData();
         } else if (key === ']' && selectedStudents.length > 0) {
             selectedStudents.forEach(studentId => {
-                behaviorCounts[studentId].bad = 0;
-                const seat = seats.find(seat => parseInt(seat.textContent) === studentId);
-                if (seat) seat.classList.remove('bad');
+                if (behaviorCounts[studentId].bad > 0) {
+                    behaviorCounts[studentId].bad--;
+                    const seat = seats.find(seat => parseInt(seat.textContent) === studentId);
+                    if (seat) seat.classList.remove('bad');
+                }
             });
             statusDisplay.textContent = `Bad behavior removed from Group ${selectedStudents.join(', ')}.`;
+            updateSeats();
             saveBehaviorData();
         }
     });

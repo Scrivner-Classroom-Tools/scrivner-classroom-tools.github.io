@@ -128,10 +128,6 @@
             <p id="user-info"></p>
         </div>
     </div>
-
-<script>
-    import config from 'config.js';
-</script>
     
 <script>
     // Initialize Supabase
@@ -174,9 +170,8 @@
 </script>
 
 <script>
-    import config from 'config.js';
     function navigateToFile(fileName) {
-        window.location.href = `https://{config.DOMAIN}/classroom/` + fileName;
+        window.location.href = `https://classroom.scrivner.org/classroom/` + fileName;
     }
 </script>
 
@@ -188,7 +183,7 @@
 
 <script>
     function navigateToG(gsiteName) {
-        window.location.href = 'https://classroom.scrivner.xyz/goguardian/' + gsiteName;
+        window.location.href = 'https://classroom.scrivner.org/goguardian/' + gsiteName;
     }
 </script>
 

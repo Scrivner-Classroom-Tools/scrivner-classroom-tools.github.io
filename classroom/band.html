@@ -179,6 +179,31 @@ const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         localStorage.setItem('behaviorData', JSON.stringify(dataToSave));
     }
 
+    async function initializeDefaultBehaviorData() {
+    let defaultData = [];
+
+    for (let i = 1; i <= totalStudents; i++) {
+        defaultData.push({
+            student_id: i,
+            nickname: '',
+            good: 0,
+            bad: 0
+        });
+    }
+
+    const { error } = await supabase
+        .from('behavior_chart')
+        .insert(defaultData);
+
+    if (error) {
+        console.error('Error initializing default data:', error);
+    } else {
+        console.log("Default data inserted successfully!");
+        loadBehaviorData(); // Re-load after inserting defaults
+    }
+}
+
+
     // Load behavior and nickname data from localStorage on page load
     async function loadBehaviorData() {
     const { data, error } = await supabase
@@ -211,30 +236,7 @@ const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
 
-    async function initializeDefaultBehaviorData() {
-    let defaultData = [];
-
-    for (let i = 1; i <= totalStudents; i++) {
-        defaultData.push({
-            student_id: i,
-            nickname: '',
-            good: 0,
-            bad: 0
-        });
-    }
-
-    const { error } = await supabase
-        .from('behavior_chart')
-        .insert(defaultData);
-
-    if (error) {
-        console.error('Error initializing default data:', error);
-    } else {
-        console.log("Default data inserted successfully!");
-        loadBehaviorData(); // Re-load after inserting defaults
-    }
-}
-
+    
 
 
     // Update the seat UI with behavior data

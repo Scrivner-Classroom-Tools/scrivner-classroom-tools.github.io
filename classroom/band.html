@@ -91,29 +91,9 @@
 </div>
 
 <script>
-    const seatingChart = document.getElementById('seatingChart');
-    const statusDisplay = document.getElementById('status');
-    let selectedStudents = [];
-    const seats = [];
+    // Initialize behavior counts and nicknames
     let behaviorCounts = {}; 
     let nicknames = {};
-
-    const groups = {
-        1: [1, 2, 3, 4, 5, 6],                   
-        2: [7, 8, 9, 10, 11],                    
-        3: [12, 13, 14],                         
-        4: [15, 16, 17],                         
-        5: [18, 19],                             
-        6: [20, 21, 22, 23],                     
-        7: [24, 25, 26, 27],                     
-    };
-
-    const rows = [
-        [1, 2, 3, 4, 5, 6], 
-        [7, 8, 9, 10, 11, 12, 13, 14],
-        [15, 16, 17, 18, 19, 20, 21, 22, 23],
-        [24, 25, 26, 27]
-    ];
 
     // Function to load behavior data from localStorage
     function loadBehaviorData() {
@@ -121,8 +101,13 @@
 
         data.forEach(entry => {
             const studentId = entry.student_id;
-            behaviorCounts[studentId] = { good: entry.good_behavior, bad: entry.bad_behavior };
-            nicknames[studentId] = entry.nickname;
+            // Ensure behavior data is initialized properly
+            if (!behaviorCounts[studentId]) {
+                behaviorCounts[studentId] = { good: 0, bad: 0 };
+            }
+            behaviorCounts[studentId].good = entry.good_behavior || 0;
+            behaviorCounts[studentId].bad = entry.bad_behavior || 0;
+            nicknames[studentId] = entry.nickname || '';
         });
 
         updateSeats();
@@ -154,22 +139,6 @@
                 seat.classList.add('bad');
             }
         });
-    }
-
-    // Function to select a seat (handle behavior)
-    function selectSeat(seat) {
-        const studentId = parseInt(seat.textContent);
-
-        if (selectedStudents.includes(studentId)) {
-            selectedStudents = selectedStudents.filter(id => id !== studentId);
-            seat.classList.remove('selected');
-        } else {
-            selectedStudents.push(studentId);
-            seat.classList.add('selected');
-        }
-
-        // Update status text
-        statusDisplay.textContent = `Selected: ${selectedStudents.join(', ')}`;
     }
 
     // Initialize seating chart
@@ -208,8 +177,8 @@
 
     // Load behavior data from localStorage when page loads
     loadBehaviorData();
-
 </script>
+
 
 </body>
 </html>

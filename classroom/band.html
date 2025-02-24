@@ -116,8 +116,8 @@
 
     // Initialize behaviorCounts and nicknames with zero behavior tallies and empty nicknames
     for (let i = 1; i <= totalStudents; i++) {
-        behaviorCounts[i] = { good: 0, bad: 0 };  // Initialize behavior counts
-        nicknames[i] = '';  // Initialize nicknames
+        behaviorCounts[i] = behaviorCounts[i] || { good: 0, bad: 0 };  // Ensure initialization
+        nicknames[i] = nicknames[i] || '';  // Ensure initialization
     }
 
     // Define rows: 6 seats in the first row, 8 in the second, 9 in the third, 4 in the fourth
@@ -142,7 +142,7 @@
             // Add nickname input field above each seat
             const nicknameInput = document.createElement('input');
             nicknameInput.classList.add('nickname-input');
-            nicknameInput.value = nicknames[studentId];
+            nicknameInput.value = nicknames[studentId] || '';
             nicknameInput.placeholder = "Nickname";
             nicknameInput.addEventListener('input', (event) => {
                 nicknames[studentId] = event.target.value;
@@ -152,7 +152,7 @@
             // Add behavior count display to each seat
             const behaviorDisplay = document.createElement('div');
             behaviorDisplay.classList.add('behavior-count');
-            behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good} | Bad: ${behaviorCounts[studentId].bad}`;
+            behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good || 0} | Bad: ${behaviorCounts[studentId].bad || 0}`;
             seat.appendChild(nicknameInput);
             seat.appendChild(behaviorDisplay);
 

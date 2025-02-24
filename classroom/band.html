@@ -182,6 +182,14 @@
         } else {
             console.log("No saved behavior data found.");
         }
+
+        // Ensure all student behavior counts are properly initialized to avoid undefined errors
+        for (let studentId = 1; studentId <= totalStudents; studentId++) {
+            if (!behaviorCounts[studentId]) {
+                behaviorCounts[studentId] = { good: 0, bad: 0 };
+            }
+        }
+
         updateSeats();
     }
 
@@ -190,18 +198,20 @@
         seats.forEach(seat => {
             const studentId = parseInt(seat.textContent);
             const behaviorDisplay = seat.querySelector('.behavior-count');
-            if (behaviorCounts[studentId]) {
-                behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good || 0} | Bad: ${behaviorCounts[studentId].bad || 0}`;
-            }
+            
+            // Ensure the student has valid behavior data
+            const studentBehavior = behaviorCounts[studentId] || { good: 0, bad: 0 };
+            
+            behaviorDisplay.textContent = `Good: ${studentBehavior.good || 0} | Bad: ${studentBehavior.bad || 0}`;
 
             // Apply good and bad behavior styles
-            if (behaviorCounts[studentId].good > 0) {
+            if (studentBehavior.good > 0) {
                 seat.classList.add('good');
             } else {
                 seat.classList.remove('good');
             }
 
-            if (behaviorCounts[studentId].bad > 0) {
+            if (studentBehavior.bad > 0) {
                 seat.classList.add('bad');
             } else {
                 seat.classList.remove('bad');

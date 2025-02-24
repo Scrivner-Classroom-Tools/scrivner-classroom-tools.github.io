@@ -172,6 +172,44 @@
         }
     }
 
+    // Function to apply Good behavior to selected students
+    function setGoodBehavior() {
+        selectedStudents.forEach(studentId => {
+            behaviorCounts[studentId].good += 1;
+            behaviorCounts[studentId].bad = 0; // Remove Bad behavior if Good is selected
+        });
+        updateSeats();
+        saveBehaviorData();
+    }
+
+    // Function to apply Bad behavior to selected students
+    function setBadBehavior() {
+        selectedStudents.forEach(studentId => {
+            behaviorCounts[studentId].bad += 1;
+            behaviorCounts[studentId].good = 0; // Remove Good behavior if Bad is selected
+        });
+        updateSeats();
+        saveBehaviorData();
+    }
+
+    // Function to delete Good behavior
+    function deleteGoodBehavior() {
+        selectedStudents.forEach(studentId => {
+            behaviorCounts[studentId].good = 0;
+        });
+        updateSeats();
+        saveBehaviorData();
+    }
+
+    // Function to delete Bad behavior
+    function deleteBadBehavior() {
+        selectedStudents.forEach(studentId => {
+            behaviorCounts[studentId].bad = 0;
+        });
+        updateSeats();
+        saveBehaviorData();
+    }
+
     // Initialize the seating chart with seats
     rows.forEach(row => {
         const rowDiv = document.createElement('div');
@@ -208,6 +246,23 @@
 
     // Load behavior data from localStorage when the page loads
     loadBehaviorData();
+
+    // Add event listener for keypresses
+    document.addEventListener('keydown', (event) => {
+        if (event.key >= '1' && event.key <= '7') {
+            const groupNumber = parseInt(event.key);
+            selectedStudents = rows[groupNumber - 1]; // Select the group by number
+            updateSeats();
+        } else if (event.key === 'G' || event.key === 'g') {
+            setGoodBehavior();
+        } else if (event.key === 'B' || event.key === 'b') {
+            setBadBehavior();
+        } else if (event.key === '[') {
+            deleteGoodBehavior();
+        } else if (event.key === ']') {
+            deleteBadBehavior();
+        }
+    });
 </script>
 
 </body>

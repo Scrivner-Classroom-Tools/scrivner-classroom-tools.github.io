@@ -182,7 +182,7 @@ const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     // Load behavior and nickname data from localStorage on page load
     async function loadBehaviorData() {
     const { data, error } = await supabase
-        .from('behavior_chart')  // Replace with your actual table name
+        .from('behavior_chart')  // Make sure this matches your Supabase table name
         .select('*');
 
     if (error) {
@@ -190,20 +190,26 @@ const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         return;
     }
 
-    if (data.length > 0) {
-        // Reset local behaviorCounts and nicknames
-        behaviorCounts = {};
-        nicknames = {};
-
-        data.forEach(entry => {
-            const studentId = entry.student_id;
-            behaviorCounts[studentId] = { good: entry.good, bad: entry.bad };
-            nicknames[studentId] = entry.nickname || ''; // Handle potential null values
-        });
-
-        updateSeats();
+    // If there's no data yet, initialize default values
+    if (!data || data.length === 0) {
+        console.log("No existing data found. Initializing default behavior data...");
+        initializeDefaultBehaviorData(); // Function to populate default values
+        return;
     }
+
+    // Reset local behaviorCounts and nicknames
+    behaviorCounts = {};
+    nicknames = {};
+
+    data.forEach(entry => {
+        const studentId = entry.student_id;
+        behaviorCounts[studentId] = { good: entry.good || 0, bad: entry.bad || 0 };
+        nicknames[studentId] = entry.nickname || ''; // Handle potential null values
+    });
+
+    updateSeats();
 }
+
 
 
     // Update the seat UI with behavior data

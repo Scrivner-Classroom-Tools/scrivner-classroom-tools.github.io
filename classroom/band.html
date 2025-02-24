@@ -100,6 +100,9 @@
     let behaviorCounts = {}; // To keep track of Good/Bad counts for each student
     let nicknames = {}; // To store nicknames
 
+    // Total number of students
+    const totalStudents = 30;
+
     // Define the groupings
     const groups = {
         1: [1, 2, 3, 4, 5, 6],                   
@@ -111,13 +114,10 @@
         7: [24, 25, 26, 27],                     
     };
 
-    // Total number of students
-    const totalStudents = 30;
-
     // Initialize behaviorCounts and nicknames with zero behavior tallies and empty nicknames
     for (let i = 1; i <= totalStudents; i++) {
-        behaviorCounts[i] = { good: 0, bad: 0 };
-        nicknames[i] = ''; // Initial nickname is empty
+        behaviorCounts[i] = behaviorCounts[i] || { good: 0, bad: 0 };  // Make sure it's initialized
+        nicknames[i] = nicknames[i] || '';  // Make sure the nickname is initialized
     }
 
     // Define rows: 6 seats in the first row, 8 in the second, 9 in the third, 4 in the fourth
@@ -152,7 +152,7 @@
             // Add behavior count display to each seat
             const behaviorDisplay = document.createElement('div');
             behaviorDisplay.classList.add('behavior-count');
-            behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId]?.good || 0} | Bad: ${behaviorCounts[studentId]?.bad || 0}`;
+            behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good} | Bad: ${behaviorCounts[studentId].bad}`;
             seat.appendChild(nicknameInput);
             seat.appendChild(behaviorDisplay);
 
@@ -177,9 +177,11 @@
     function loadBehaviorData() {
         const savedData = JSON.parse(localStorage.getItem('behaviorData'));
         if (savedData) {
-            behaviorCounts = savedData.behaviorCounts;
-            nicknames = savedData.nicknames;
+            behaviorCounts = savedData.behaviorCounts || {};  // Add fallback to empty object
+            nicknames = savedData.nicknames || {};  // Add fallback to empty object
             updateSeats();
+        } else {
+            console.log("No saved behavior data found.");
         }
     }
 
@@ -187,14 +189,20 @@
     function updateSeats() {
         seats.forEach(seat => {
             const studentId = parseInt(seat.textContent);
-            const behaviorDisplay = seat.querySelector('.behavior-count');
-            behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId]?.good || 0} | Bad: ${behaviorCounts[studentId]?.bad || 0}`;
+            if (behaviorCounts[studentId]) {
+                const behaviorDisplay = seat.querySelector('.behavior-count');
+                if (behaviorDisplay) {
+                    behaviorDisplay.textContent = `Good: ${behaviorCounts[studentId].good || 0} | Bad: ${behaviorCounts[studentId].bad || 0}`;
+                }
 
-            if (behaviorCounts[studentId]?.good > 0) {
-                seat.classList.add('good');
-            }
-            if (behaviorCounts[studentId]?.bad > 0) {
-                seat.classList.add('bad');
+                if (behaviorCounts[studentId].good > 0) {
+                    seat.classList.add('good');
+                }
+                if (behaviorCounts[studentId].bad > 0) {
+                    seat.classList.add('bad');
+                }
+            } else {
+                console.error(`No behavior data found for student ID: ${studentId}`);
             }
         });
     }

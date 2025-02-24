@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../Scrivner_Classroom_Tools_Logo_Circle.png" type="image/png">
     <title>Behavior Chart</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -92,13 +91,6 @@
 </div>
 
 <script>
-    // Supabase URL and Key - initialized first
-    const SUPABASE_URL = "https://dqkjwnvdqzukhzvdtidr.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxa2p3bnZkcXp1a2h6dmR0aWRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5OTU4NjYsImV4cCI6MjA1NTU3MTg2Nn0.TCrjefgNWfi_YIPy-2PUBPBTPf5Dtn-DPQOVY3wV5RE";
-
-    // Initialize the Supabase client after URL and key
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
     const seatingChart = document.getElementById('seatingChart');
     const statusDisplay = document.getElementById('status');
     let selectedStudents = [];
@@ -123,16 +115,9 @@
         [24, 25, 26, 27]
     ];
 
-    // Function to load behavior data from Supabase
-    async function loadBehaviorData() {
-        const { data, error } = await supabase
-            .from('behavior_data')
-            .select('*');
-
-        if (error) {
-            console.error('Error loading behavior data:', error);
-            return;
-        }
+    // Function to load behavior data from localStorage
+    function loadBehaviorData() {
+        const data = JSON.parse(localStorage.getItem('behaviorData')) || [];
 
         data.forEach(entry => {
             const studentId = entry.student_id;
@@ -143,8 +128,8 @@
         updateSeats();
     }
 
-    // Function to save behavior data to Supabase
-    async function saveBehaviorData() {
+    // Function to save behavior data to localStorage
+    function saveBehaviorData() {
         const dataToSave = Object.keys(behaviorCounts).map(studentId => ({
             student_id: studentId,
             good_behavior: behaviorCounts[studentId].good,
@@ -152,13 +137,7 @@
             nickname: nicknames[studentId]
         }));
 
-        const { error } = await supabase
-            .from('behavior_data')
-            .upsert(dataToSave);
-
-        if (error) {
-            console.error('Error saving behavior data:', error);
-        }
+        localStorage.setItem('behaviorData', JSON.stringify(dataToSave));
     }
 
     // Function to update the seating chart with behavior data
@@ -227,7 +206,7 @@
         seatingChart.appendChild(rowDiv);
     });
 
-    // Load behavior data on page load
+    // Load behavior data from localStorage when page loads
     loadBehaviorData();
 
 </script>

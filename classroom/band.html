@@ -92,11 +92,11 @@
 </div>
 
 <script>
-    // Supabase URL and Key
+    // Supabase URL and Key - initialized first
     const SUPABASE_URL = "https://dqkjwnvdqzukhzvdtidr.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxa2p3bnZkcXp1a2h6dmR0aWRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5OTU4NjYsImV4cCI6MjA1NTU3MTg2Nn0.TCrjefgNWfi_YIPy-2PUBPBTPf5Dtn-DPQOVY3wV5RE";
 
-    // Initialize Supabase client
+    // Initialize the Supabase client after URL and key
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const seatingChart = document.getElementById('seatingChart');

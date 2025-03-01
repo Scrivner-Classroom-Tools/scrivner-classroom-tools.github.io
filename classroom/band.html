@@ -155,7 +155,7 @@
             <h2>Scrivner Classroom Tools</h2>
         </div>
         <div class="nav-buttons">
-            <a onclick="navigateToFile('classroom')">Home</a>
+            <a onclick="navigateToHome()">Home</a>
             <a href="#">About</a>
             <a href="mailto:support@scrivner.org">Contact</a>
         </div>
@@ -173,6 +173,12 @@
         <p>'G' for Good behavior, 'B' for Bad behavior. '[' and ']' to delete.</p>
     </div>
 </div>
+
+<script>
+    function navigateToHome() {
+        window.location.href = `https://classroom.scrivner.org`;
+    }
+</script>
 
 <script>
     const seatingChart = document.getElementById('seatingChart');

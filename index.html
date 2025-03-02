@@ -98,6 +98,19 @@
 </head>
 <body>
 
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+<script src="firebase-config.js"></script>
+
+
+
+
+
+
+
+
+    
     <!-- Banner -->
     <div class="banner">
         <div class="logo-title">
@@ -108,6 +121,7 @@
             <a href="https://classroom.scrivner.org">Home</a>
             <a href="https://docs.google.com/document/d/1rDll43RViTcu0mTrUQPs8d2VR0mILsUZ8xmLaBJiuD8/edit?usp=sharing">About</a>
             <a href="mailto:support@scrivner.org">Contact</a>
+            <a onclick="googleLogin()">Sign In</a>
         </div>
     </div>
 
@@ -126,6 +140,43 @@
             <p id="user-info"></p>
         </div>
     </div>
+
+
+
+
+
+<script>
+  // Firebase Initialization
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  function googleLogin() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider)
+      .then(result => {
+        const user = result.user;
+        document.getElementById("userData").innerHTML = `
+          Welcome ${user.displayName} <br>
+          Email: ${user.email}
+        `;
+        saveUser(user);
+      })
+      .catch(console.error);
+  }
+
+  function saveUser(user) {
+    db.collection("users").doc(user.uid).set({
+      name: user.displayName,
+      email: user.email,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+</script>
+
+
+
+    
     
 <script>
     // Initialize Supabase

@@ -99,19 +99,7 @@
 </head>
 <body>
 
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-<script src="firebase-config.js"></script>
-
-
-
-
-
-
-
-
-    
+ 
     <!-- Banner -->
     <div class="banner">
         <div class="logo-title">
@@ -120,104 +108,13 @@
         </div>
         <div class="nav-buttons">
             <a href="https://classroom.scrivner.org">Home</a>
-            <a href="https://docs.google.com/document/d/1rDll43RViTcu0mTrUQPs8d2VR0mILsUZ8xmLaBJiuD8/edit?usp=sharing">About</a>
+            <a href="https://legal.scrivner.org/legal/terms">Terms of Service</a>
+            <a href="https://legal.scrivner.org/legal/privacy">Privacy Policy</a>
             <a href="mailto:support@scrivner.org">Contact</a>
-            <a onclick="googleLogin()">Sign In</a>
         </div>
     </div>
 
     <!-- Main Content -->
-    <div class="content-container">
-        <div id="menu">
-            <h1>Classroom Utilities</h1>
-            <button class="game-button" onclick="navigateToFile('group')">Random Group Generator</button>
-            <button class="game-button" onclick="navigateToFile('band')">Behavior Chart</button>
-        </div>
-
-        <div id="login">
-            <h1>Supabase Google Login</h1>
-            <button onclick="googleLogin()">Sign in with Google</button>
-            <button onclick="signOut()">Sign out</button>
-            <p id="user-info"></p>
-        </div>
-    </div>
-
-
-
-
-
-<script>
-  // Firebase Initialization
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  function googleLogin() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider)
-      .then(result => {
-        const user = result.user;
-        document.getElementById("userData").innerHTML = `
-          Welcome ${user.displayName} <br>
-          Email: ${user.email}
-        `;
-        saveUser(user);
-      })
-      .catch(console.error);
-  }
-
-  function saveUser(user) {
-    db.collection("users").doc(user.uid).set({
-      name: user.displayName,
-      email: user.email,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  }
-</script>
-
-
-
-    
-    
-<script>
-    // Initialize Supabase
-    const SUPABASE_URL = "https://dqkjwnvdqzukhzvdtidr.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxa2p3bnZkcXp1a2h6dmR0aWRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5OTU4NjYsImV4cCI6MjA1NTU3MTg2Nn0.TCrjefgNWfi_YIPy-2PUBPBTPf5Dtn-DPQOVY3wV5RE";
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // Google Sign-In
-    async function signInWithGoogle() {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: "google",
-        });
-        if (error) {
-            console.error("Google sign-in error:", error.message);
-        } else {
-            console.log("Redirecting to Google...");
-        }
-    }
-
-    // Check if user is logged in
-    async function checkUser() {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-            console.log("User logged in:", user);
-            document.getElementById("user-info").innerText = `Welcome, ${user.email}`;
-        } else {
-            console.log("No user logged in.");
-        }
-    }
-
-    // Sign out
-    async function signOut() {
-        await supabase.auth.signOut();
-        console.log("User signed out");
-        location.reload();
-    }
-
-    // Check if user is already logged in on page load
-    checkUser();
-</script>
 
 <script>
     function navigateToFile(fileName) {

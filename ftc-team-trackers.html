@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Robotics Team Scouting Survey</title>
+  <title>Robotics Team Scouting</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -22,11 +22,11 @@
       color: #2c3e50;
     }
 
-    form {
+    form, .controls {
       background: white;
       padding: 20px;
-      max-width: 500px;
-      margin: 0 auto 40px;
+      max-width: 600px;
+      margin: 0 auto 30px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       border-radius: 8px;
     }
@@ -46,8 +46,8 @@
       margin-top: 5px;
       border-radius: 4px;
       border: 1px solid #ccc;
-      box-sizing: border-box;
       font-size: 14px;
+      box-sizing: border-box;
     }
 
     textarea {
@@ -66,7 +66,6 @@
       border-radius: 5px;
       cursor: pointer;
       transition: background-color 0.3s ease;
-      width: 100%;
     }
 
     button:hover {
@@ -74,7 +73,7 @@
     }
 
     .team-list {
-      max-width: 700px;
+      max-width: 800px;
       margin: 0 auto;
     }
 
@@ -84,6 +83,7 @@
       border-radius: 8px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
       margin-bottom: 15px;
+      position: relative;
     }
 
     .team-card h3 {
@@ -102,104 +102,227 @@
       font-size: 14px;
     }
 
+    .team-card .btn-group {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+    }
+
+    .btn-small {
+      background-color: #f39c12;
+      border: none;
+      color: white;
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+
+    .btn-small:hover {
+      background-color: #e67e22;
+    }
+
+    .btn-danger {
+      background-color: #e74c3c !important;
+    }
+
+    .btn-danger:hover {
+      background-color: #c0392b !important;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .controls input[type="file"] {
+      font-size: 14px;
+    }
+
+    .average {
+      font-weight: bold;
+      color: #27ae60;
+    }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>Robotics Team Scouting Survey</h1>
-    <p>Enter details about each team to keep track of their skills and robot capabilities.</p>
-  </header>
+<header>
+  <h1>Robotics Team Scouting</h1>
+  <p>Manage and export/import team data efficiently.</p>
+</header>
 
-  <form id="scoutForm">
-    <label for="teamNumber">Team Number</label>
-    <input type="number" id="teamNumber" name="teamNumber" required min="1" />
+<form id="scoutForm">
+  <input type="hidden" id="editIndex" />
 
-    <label for="driverSkill">Driver Skill (1-10)</label>
-    <input type="number" id="driverSkill" name="driverSkill" required min="1" max="10" />
+  <label for="teamNumber">Team Number</label>
+  <input type="number" id="teamNumber" required min="1" />
 
-    <label for="programmingSkill">Programming Skill (1-10)</label>
-    <input type="number" id="programmingSkill" name="programmingSkill" required min="1" max="10" />
+  <label for="driverSkill">Driver Skill (1-10)</label>
+  <input type="number" id="driverSkill" required min="1" max="10" />
 
-    <label for="robotCapabilities">Robot Capabilities</label>
-    <select id="robotCapabilities" name="robotCapabilities" required>
-      <option value="" disabled selected>Select capabilities</option>
-      <option value="Autonomous Navigation">Autonomous Navigation</option>
-      <option value="Object Manipulation">Object Manipulation</option>
-      <option value="Shooting/Scoring">Shooting/Scoring</option>
-      <option value="Climbing">Climbing</option>
-      <option value="Other">Other</option>
-    </select>
+  <label for="programmingSkill">Programming Skill (1-10)</label>
+  <input type="number" id="programmingSkill" required min="1" max="10" />
 
-    <label for="notes">Additional Notes</label>
-    <textarea id="notes" name="notes" placeholder="Enter any extra information here..."></textarea>
+  <label for="robotCapabilities">Robot Capabilities</label>
+  <select id="robotCapabilities" required>
+    <option value="" disabled selected>Select capabilities</option>
+    <option value="Autonomous Navigation">Autonomous Navigation</option>
+    <option value="Object Manipulation">Object Manipulation</option>
+    <option value="Shooting/Scoring">Shooting/Scoring</option>
+    <option value="Climbing">Climbing</option>
+    <option value="Other">Other</option>
+  </select>
 
-    <button type="submit">Add Team</button>
-  </form>
+  <label for="notes">Additional Notes</label>
+  <textarea id="notes" placeholder="Enter any extra information..."></textarea>
 
-  <section class="team-list" id="teamList">
-    <!-- Teams will be added here -->
-  </section>
+  <button type="submit" id="submitButton">Add Team</button>
+</form>
 
-  <script>
-    const form = document.getElementById('scoutForm');
-    const teamList = document.getElementById('teamList');
+<div class="controls">
+  <button onclick="exportCSV()">📤 Export CSV</button>
+  <input type="file" accept=".csv" onchange="importCSV(event)">
+</div>
 
-    // Store teams in an array
-    let teams = [];
+<section class="team-list" id="teamList"></section>
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
+<script>
+  const form = document.getElementById('scoutForm');
+  const teamList = document.getElementById('teamList');
+  const submitButton = document.getElementById('submitButton');
 
-      const teamNumber = form.teamNumber.value.trim();
-      const driverSkill = form.driverSkill.value.trim();
-      const programmingSkill = form.programmingSkill.value.trim();
-      const robotCapabilities = form.robotCapabilities.value;
-      const notes = form.notes.value.trim();
+  let teams = [];
 
-      // Simple validation to avoid duplicates by team number
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const teamNumber = form.teamNumber.value.trim();
+    const driverSkill = parseInt(form.driverSkill.value.trim());
+    const programmingSkill = parseInt(form.programmingSkill.value.trim());
+    const robotCapabilities = form.robotCapabilities.value;
+    const notes = form.notes.value.trim();
+    const editIndex = form.editIndex.value;
+
+    const average = (driverSkill + programmingSkill) / 2;
+
+    const team = {
+      teamNumber,
+      driverSkill,
+      programmingSkill,
+      robotCapabilities,
+      notes,
+      average
+    };
+
+    if (editIndex === "") {
       if (teams.some(t => t.teamNumber === teamNumber)) {
-        alert(`Team #${teamNumber} is already added.`);
+        alert(`Team #${teamNumber} already exists. Use Edit.`);
         return;
       }
-
-      // Create a team object
-      const team = {
-        teamNumber,
-        driverSkill,
-        programmingSkill,
-        robotCapabilities,
-        notes
-      };
-
       teams.push(team);
-      displayTeams();
-
-      // Reset form
-      form.reset();
-    });
-
-    function displayTeams() {
-      teamList.innerHTML = '';
-
-      teams.forEach(team => {
-        const card = document.createElement('div');
-        card.className = 'team-card';
-
-        card.innerHTML = `
-          <h3>Team #${team.teamNumber}</h3>
-          <div class="team-details">
-            <div class="team-detail"><strong>Driver Skill:</strong> ${team.driverSkill}/10</div>
-            <div class="team-detail"><strong>Programming Skill:</strong> ${team.programmingSkill}/10</div>
-            <div class="team-detail"><strong>Capabilities:</strong> ${team.robotCapabilities}</div>
-          </div>
-          <p><strong>Notes:</strong> ${team.notes || 'None'}</p>
-        `;
-
-        teamList.appendChild(card);
-      });
+    } else {
+      teams[parseInt(editIndex)] = team;
+      form.editIndex.value = "";
+      submitButton.textContent = "Add Team";
     }
-  </script>
+
+    form.reset();
+    displayTeams();
+  });
+
+  function displayTeams() {
+    teams.sort((a, b) => b.average - a.average);
+    teamList.innerHTML = '';
+
+    teams.forEach((team, index) => {
+      const card = document.createElement('div');
+      card.className = 'team-card';
+
+      card.innerHTML = `
+        <h3>Team #${team.teamNumber}</h3>
+        <div class="team-details">
+          <div class="team-detail"><strong>Driver Skill:</strong> ${team.driverSkill}/10</div>
+          <div class="team-detail"><strong>Programming Skill:</strong> ${team.programmingSkill}/10</div>
+          <div class="team-detail"><strong>Capabilities:</strong> ${team.robotCapabilities}</div>
+          <div class="team-detail average">Avg Score: ${team.average.toFixed(2)}</div>
+        </div>
+        <p><strong>Notes:</strong> ${team.notes || 'None'}</p>
+        <div class="btn-group">
+          <button class="btn-small" onclick="editTeam(${index})">Edit</button>
+          <button class="btn-small btn-danger" onclick="deleteTeam(${index})">Delete</button>
+        </div>
+      `;
+      teamList.appendChild(card);
+    });
+  }
+
+  window.editTeam = function(index) {
+    const team = teams[index];
+    form.teamNumber.value = team.teamNumber;
+    form.driverSkill.value = team.driverSkill;
+    form.programmingSkill.value = team.programmingSkill;
+    form.robotCapabilities.value = team.robotCapabilities;
+    form.notes.value = team.notes;
+    form.editIndex.value = index;
+    submitButton.textContent = "Update Team";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  window.deleteTeam = function(index) {
+    if (confirm(`Are you sure you want to delete Team #${teams[index].teamNumber}?`)) {
+      teams.splice(index, 1);
+      displayTeams();
+    }
+  }
+
+  function exportCSV() {
+    const headers = ["Team Number", "Driver Skill", "Programming Skill", "Robot Capabilities", "Notes"];
+    const rows = teams.map(team =>
+      [team.teamNumber, team.driverSkill, team.programmingSkill, team.robotCapabilities, `"${team.notes.replace(/"/g, '""')}"`]
+    );
+
+    const csvContent = [headers, ...rows].map(r => r.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "scouting_data.csv";
+    a.click();
+  }
+
+  function importCSV(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const lines = e.target.result.split("\n").filter(line => line.trim() !== "");
+      const [header, ...dataRows] = lines;
+
+      const newTeams = dataRows.map(row => {
+        const [teamNumber, driverSkill, programmingSkill, robotCapabilities, notes] = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/^"|"$/g, "").trim());
+        const average = (parseInt(driverSkill) + parseInt(programmingSkill)) / 2;
+        return {
+          teamNumber,
+          driverSkill: parseInt(driverSkill),
+          programmingSkill: parseInt(programmingSkill),
+          robotCapabilities,
+          notes,
+          average
+        };
+      });
+
+      teams = newTeams;
+      displayTeams();
+    };
+    reader.readAsText(file);
+  }
+</script>
 
 </body>
 </html>

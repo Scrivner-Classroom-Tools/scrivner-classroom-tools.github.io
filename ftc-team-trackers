@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Robotics Team Scouting Survey</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      color: #2c3e50;
+    }
+
+    form {
+      background: white;
+      padding: 20px;
+      max-width: 500px;
+      margin: 0 auto 40px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    button {
+      margin-top: 20px;
+      background-color: #3498db;
+      border: none;
+      padding: 12px 20px;
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    .team-list {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .team-card {
+      background: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+    }
+
+    .team-card h3 {
+      margin-top: 0;
+      color: #2c3e50;
+    }
+
+    .team-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .team-detail {
+      flex: 1 1 200px;
+      font-size: 14px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Robotics Team Scouting Survey</h1>
+    <p>Enter details about each team to keep track of their skills and robot capabilities.</p>
+  </header>
+
+  <form id="scoutForm">
+    <label for="teamNumber">Team Number</label>
+    <input type="number" id="teamNumber" name="teamNumber" required min="1" />
+
+    <label for="driverSkill">Driver Skill (1-10)</label>
+    <input type="number" id="driverSkill" name="driverSkill" required min="1" max="10" />
+
+    <label for="programmingSkill">Programming Skill (1-10)</label>
+    <input type="number" id="programmingSkill" name="programmingSkill" required min="1" max="10" />
+
+    <label for="robotCapabilities">Robot Capabilities</label>
+    <select id="robotCapabilities" name="robotCapabilities" required>
+      <option value="" disabled selected>Select capabilities</option>
+      <option value="Autonomous Navigation">Autonomous Navigation</option>
+      <option value="Object Manipulation">Object Manipulation</option>
+      <option value="Shooting/Scoring">Shooting/Scoring</option>
+      <option value="Climbing">Climbing</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <label for="notes">Additional Notes</label>
+    <textarea id="notes" name="notes" placeholder="Enter any extra information here..."></textarea>
+
+    <button type="submit">Add Team</button>
+  </form>
+
+  <section class="team-list" id="teamList">
+    <!-- Teams will be added here -->
+  </section>
+
+  <script>
+    const form = document.getElementById('scoutForm');
+    const teamList = document.getElementById('teamList');
+
+    // Store teams in an array
+    let teams = [];
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const teamNumber = form.teamNumber.value.trim();
+      const driverSkill = form.driverSkill.value.trim();
+      const programmingSkill = form.programmingSkill.value.trim();
+      const robotCapabilities = form.robotCapabilities.value;
+      const notes = form.notes.value.trim();
+
+      // Simple validation to avoid duplicates by team number
+      if (teams.some(t => t.teamNumber === teamNumber)) {
+        alert(`Team #${teamNumber} is already added.`);
+        return;
+      }
+
+      // Create a team object
+      const team = {
+        teamNumber,
+        driverSkill,
+        programmingSkill,
+        robotCapabilities,
+        notes
+      };
+
+      teams.push(team);
+      displayTeams();
+
+      // Reset form
+      form.reset();
+    });
+
+    function displayTeams() {
+      teamList.innerHTML = '';
+
+      teams.forEach(team => {
+        const card = document.createElement('div');
+        card.className = 'team-card';
+
+        card.innerHTML = `
+          <h3>Team #${team.teamNumber}</h3>
+          <div class="team-details">
+            <div class="team-detail"><strong>Driver Skill:</strong> ${team.driverSkill}/10</div>
+            <div class="team-detail"><strong>Programming Skill:</strong> ${team.programmingSkill}/10</div>
+            <div class="team-detail"><strong>Capabilities:</strong> ${team.robotCapabilities}</div>
+          </div>
+          <p><strong>Notes:</strong> ${team.notes || 'None'}</p>
+        `;
+
+        teamList.appendChild(card);
+      });
+    }
+  </script>
+
+</body>
+</html>

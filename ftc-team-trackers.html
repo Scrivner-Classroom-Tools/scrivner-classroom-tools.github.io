@@ -12,21 +12,17 @@
       padding: 20px;
       color: #333;
     }
-
     header {
       text-align: center;
       margin-bottom: 30px;
     }
+    h1 { color: #2c3e50; }
 
-    h1 {
-      color: #2c3e50;
-    }
-
-    form, .controls {
+    form, .controls, .tabs {
       background: white;
       padding: 20px;
-      max-width: 600px;
-      margin: 0 auto 30px;
+      max-width: 800px;
+      margin: 0 auto 20px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       border-radius: 8px;
     }
@@ -50,10 +46,7 @@
       box-sizing: border-box;
     }
 
-    textarea {
-      resize: vertical;
-      min-height: 60px;
-    }
+    textarea { resize: vertical; min-height: 60px; }
 
     button {
       margin-top: 20px;
@@ -67,16 +60,24 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
+    button:hover { background-color: #2980b9; }
 
-    button:hover {
-      background-color: #2980b9;
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
     }
-
-    .team-list {
-      max-width: 800px;
-      margin: 0 auto;
+    .tab {
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #ecf0f1;
+      transition: background 0.3s;
     }
+    .tab.active { background: #3498db; color: white; }
 
+    .team-list { max-width: 800px; margin: 0 auto; }
     .team-card {
       background: white;
       padding: 15px 20px;
@@ -85,29 +86,20 @@
       margin-bottom: 15px;
       position: relative;
     }
-
-    .team-card h3 {
-      margin-top: 0;
-      color: #2c3e50;
-    }
+    .team-card h3 { margin-top: 0; color: #2c3e50; }
 
     .team-details {
       display: flex;
       flex-wrap: wrap;
       gap: 15px;
     }
-
-    .team-detail {
-      flex: 1 1 200px;
-      font-size: 14px;
-    }
+    .team-detail { flex: 1 1 200px; font-size: 14px; }
 
     .team-card .btn-group {
       position: absolute;
       top: 15px;
       right: 15px;
     }
-
     .btn-small {
       background-color: #f39c12;
       border: none;
@@ -118,18 +110,9 @@
       cursor: pointer;
       margin-left: 5px;
     }
-
-    .btn-small:hover {
-      background-color: #e67e22;
-    }
-
-    .btn-danger {
-      background-color: #e74c3c !important;
-    }
-
-    .btn-danger:hover {
-      background-color: #c0392b !important;
-    }
+    .btn-small:hover { background-color: #e67e22; }
+    .btn-danger { background-color: #e74c3c !important; }
+    .btn-danger:hover { background-color: #c0392b !important; }
 
     .controls {
       display: flex;
@@ -139,25 +122,30 @@
       gap: 15px;
     }
 
-    .controls input[type="file"] {
-      font-size: 14px;
-    }
-
-    .average {
-      font-weight: bold;
-      color: #27ae60;
-    }
+    .average { font-weight: bold; color: #27ae60; }
   </style>
 </head>
 <body>
 
 <header>
   <h1>Robotics Team Scouting</h1>
-  <p>Manage and export/import team data efficiently.</p>
+  <p>Manage and export/import team data by meet.</p>
 </header>
 
 <form id="scoutForm">
   <input type="hidden" id="editIndex" />
+
+  <label for="meetName">Meet</label>
+  <select id="meetName" required>
+    <option value="Meet 1">Meet 1</option>
+    <option value="Meet 2">Meet 2</option>
+    <option value="Meet 3">Meet 3</option>
+    <option value="Meet 4">Meet 4</option>
+    <option value="Meet 5">Meet 5</option>
+    <option value="League Tournament">League Tournament</option>
+    <option value="State Championship">State Championship</option>
+    <option value="Worlds">Worlds</option>
+  </select>
 
   <label for="teamNumber">Team Number</label>
   <input type="number" id="teamNumber" required min="1" />
@@ -189,18 +177,23 @@
   <input type="file" accept=".csv" onchange="importCSV(event)">
 </div>
 
+<div class="tabs" id="meetTabs"></div>
+
 <section class="team-list" id="teamList"></section>
 
 <script>
   const form = document.getElementById('scoutForm');
   const teamList = document.getElementById('teamList');
   const submitButton = document.getElementById('submitButton');
+  const meetTabs = document.getElementById('meetTabs');
 
-  let teams = [];
+  let teams = {};  // { meetName: [teamObjects] }
+  let currentMeet = null;
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
+    const meetName = form.meetName.value;
     const teamNumber = form.teamNumber.value.trim();
     const driverSkill = parseInt(form.driverSkill.value.trim());
     const programmingSkill = parseInt(form.programmingSkill.value.trim());
@@ -210,7 +203,11 @@
 
     const average = (driverSkill + programmingSkill) / 2;
 
+    if (!teams[meetName]) teams[meetName] = [];
+    if (!currentMeet) currentMeet = meetName;
+
     const team = {
+      meetName,
       teamNumber,
       driverSkill,
       programmingSkill,
@@ -220,31 +217,47 @@
     };
 
     if (editIndex === "") {
-      if (teams.some(t => t.teamNumber === teamNumber)) {
-        alert(`Team #${teamNumber} already exists. Use Edit.`);
+      if (teams[meetName].some(t => t.teamNumber === teamNumber)) {
+        alert(`Team #${teamNumber} already exists in ${meetName}. Use Edit.`);
         return;
       }
-      teams.push(team);
+      teams[meetName].push(team);
     } else {
-      teams[parseInt(editIndex)] = team;
+      teams[meetName][parseInt(editIndex)] = team;
       form.editIndex.value = "";
       submitButton.textContent = "Add Team";
     }
 
     form.reset();
+    updateTabs();
     displayTeams();
   });
 
+  function updateTabs() {
+    meetTabs.innerHTML = '';
+    Object.keys(teams).forEach(meet => {
+      const tab = document.createElement('div');
+      tab.className = 'tab' + (meet === currentMeet ? ' active' : '');
+      tab.textContent = meet;
+      tab.onclick = () => { currentMeet = meet; displayTeams(); updateTabs(); };
+      meetTabs.appendChild(tab);
+    });
+  }
+
   function displayTeams() {
-    teams.sort((a, b) => b.average - a.average);
+    if (!currentMeet || !teams[currentMeet]) {
+      teamList.innerHTML = '<p style="text-align:center; color:#888;">No teams yet.</p>';
+      return;
+    }
+    teams[currentMeet].sort((a, b) => b.average - a.average);
     teamList.innerHTML = '';
 
-    teams.forEach((team, index) => {
+    teams[currentMeet].forEach((team, index) => {
       const card = document.createElement('div');
       card.className = 'team-card';
 
       card.innerHTML = `
-        <h3>Team #${team.teamNumber}</h3>
+        <h3>${team.meetName} - Team #${team.teamNumber}</h3>
         <div class="team-details">
           <div class="team-detail"><strong>Driver Skill:</strong> ${team.driverSkill}/10</div>
           <div class="team-detail"><strong>Programming Skill:</strong> ${team.programmingSkill}/10</div>
@@ -253,16 +266,17 @@
         </div>
         <p><strong>Notes:</strong> ${team.notes || 'None'}</p>
         <div class="btn-group">
-          <button class="btn-small" onclick="editTeam(${index})">Edit</button>
-          <button class="btn-small btn-danger" onclick="deleteTeam(${index})">Delete</button>
+          <button class="btn-small" onclick="editTeam('${team.meetName}', ${index})">Edit</button>
+          <button class="btn-small btn-danger" onclick="deleteTeam('${team.meetName}', ${index})">Delete</button>
         </div>
       `;
       teamList.appendChild(card);
     });
   }
 
-  window.editTeam = function(index) {
-    const team = teams[index];
+  window.editTeam = function(meetName, index) {
+    const team = teams[meetName][index];
+    form.meetName.value = team.meetName;
     form.teamNumber.value = team.teamNumber;
     form.driverSkill.value = team.driverSkill;
     form.programmingSkill.value = team.programmingSkill;
@@ -273,19 +287,21 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  window.deleteTeam = function(index) {
-    if (confirm(`Are you sure you want to delete Team #${teams[index].teamNumber}?`)) {
-      teams.splice(index, 1);
+  window.deleteTeam = function(meetName, index) {
+    if (confirm(`Delete Team #${teams[meetName][index].teamNumber} from ${meetName}?`)) {
+      teams[meetName].splice(index, 1);
       displayTeams();
     }
   }
 
   function exportCSV() {
-    const headers = ["Team Number", "Driver Skill", "Programming Skill", "Robot Capabilities", "Notes"];
-    const rows = teams.map(team =>
-      [team.teamNumber, team.driverSkill, team.programmingSkill, team.robotCapabilities, `"${team.notes.replace(/"/g, '""')}"`]
-    );
-
+    const headers = ["Meet Name", "Team Number", "Driver Skill", "Programming Skill", "Robot Capabilities", "Notes"];
+    const rows = [];
+    for (let meet in teams) {
+      for (let team of teams[meet]) {
+        rows.push([team.meetName, team.teamNumber, team.driverSkill, team.programmingSkill, team.robotCapabilities, `"${team.notes.replace(/"/g, '""')}"`]);
+      }
+    }
     const csvContent = [headers, ...rows].map(r => r.join(",")).join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 
@@ -304,20 +320,24 @@
       const lines = e.target.result.split("\n").filter(line => line.trim() !== "");
       const [header, ...dataRows] = lines;
 
-      const newTeams = dataRows.map(row => {
-        const [teamNumber, driverSkill, programmingSkill, robotCapabilities, notes] = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/^"|"$/g, "").trim());
+      teams = {};
+      dataRows.forEach(row => {
+        const [meetName, teamNumber, driverSkill, programmingSkill, robotCapabilities, notes] = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/^"|"$/g, "").trim());
         const average = (parseInt(driverSkill) + parseInt(programmingSkill)) / 2;
-        return {
+        if (!teams[meetName]) teams[meetName] = [];
+        teams[meetName].push({
+          meetName,
           teamNumber,
           driverSkill: parseInt(driverSkill),
           programmingSkill: parseInt(programmingSkill),
           robotCapabilities,
           notes,
           average
-        };
+        });
       });
 
-      teams = newTeams;
+      currentMeet = Object.keys(teams)[0] || null;
+      updateTabs();
       displayTeams();
     };
     reader.readAsText(file);
